@@ -2,10 +2,17 @@ package com.dev.k.invoice.invoice.dto;
 
 import java.time.LocalDate;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 public class InvoiceUpdateRequest {
 
-    private String title;
+	@Size(max = 255, message = "Title must be 255 characters or less.")
+	private String title;
+	
+	@Positive(message = "Amount must be positive.")
     private Integer amount;
+	
     private LocalDate dueDate;
 
     public String getTitle() {

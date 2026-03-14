@@ -3,6 +3,8 @@ package com.dev.k.invoice.customer.controller;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,14 +30,14 @@ public class CustomerController {
     }
 
     @PostMapping
-    public ApiResponse<CustomerResponse> create(@RequestBody CustomerCreateRequest request) {
+    public ApiResponse<CustomerResponse> create(@Valid @RequestBody CustomerCreateRequest request) {
         return ApiResponse.success(customerService.create(request));
     }
 
     @PutMapping("/{customerId}")
     public ApiResponse<CustomerResponse> update(
             @PathVariable UUID customerId,
-            @RequestBody CustomerUpdateRequest request
+            @Valid @RequestBody CustomerUpdateRequest request
     ) {
         return ApiResponse.success(customerService.update(customerId, request));
     }

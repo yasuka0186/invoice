@@ -3,6 +3,8 @@ package com.dev.k.invoice.invoice.controller;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,7 +38,7 @@ public class InvoiceController {
     }
 
     @PostMapping
-    public ApiResponse<InvoiceResponse> create(@RequestBody InvoiceCreateRequest request) {
+    public ApiResponse<InvoiceResponse> create(@Valid @RequestBody InvoiceCreateRequest request) {
         return ApiResponse.success(invoiceService.create(request));
     }
 

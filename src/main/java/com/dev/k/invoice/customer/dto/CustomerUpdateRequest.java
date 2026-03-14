@@ -1,9 +1,17 @@
 package com.dev.k.invoice.customer.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+
 public class CustomerUpdateRequest {
 
+	@Size(max = 255, message = "Customer name must be 255 characters or less.")
     private String name;
+	
+	@Email(message = "Email must be a valid email address.")
+    @Size(max = 255, message = "Email must be 255 characters or less.")
     private String email;
+	
     private Boolean isActive;
 
     public String getName() {

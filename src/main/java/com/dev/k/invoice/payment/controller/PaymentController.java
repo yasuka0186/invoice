@@ -3,6 +3,8 @@ package com.dev.k.invoice.payment.controller;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +28,7 @@ public class PaymentController {
     }
 
     @PostMapping
-    public ApiResponse<PaymentResponse> create(@RequestBody PaymentCreateRequest request) {
+    public ApiResponse<PaymentResponse> create(@Valid @RequestBody PaymentCreateRequest request) {
         return ApiResponse.success(paymentService.create(request));
     }
 
