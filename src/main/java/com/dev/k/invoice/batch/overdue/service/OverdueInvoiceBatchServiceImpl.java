@@ -11,6 +11,9 @@ import com.dev.k.invoice.invoice.constant.InvoiceStatus;
 import com.dev.k.invoice.invoice.entity.Invoice;
 import com.dev.k.invoice.invoice.repository.InvoiceRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional
 public class OverdueInvoiceBatchServiceImpl implements OverdueInvoiceBatchService {
@@ -23,6 +26,8 @@ public class OverdueInvoiceBatchServiceImpl implements OverdueInvoiceBatchServic
 
     @Override
     public BatchResult execute() {
+        log.info("Batch start: overdue invoice update.");
+
         List<Invoice> targetInvoices = invoiceRepository.findByDueDateBeforeAndStatus(
                 LocalDate.now(),
                 InvoiceStatus.ISSUED
@@ -31,12 +36,16 @@ public class OverdueInvoiceBatchServiceImpl implements OverdueInvoiceBatchServic
         int targetCount = targetInvoices.size();
         int updatedCount = 0;
 
+        log.info("Batch target invoices found. targetCount={}", targetCount);
+
         for (Invoice invoice : targetInvoices) {
             invoice.setStatus(InvoiceStatus.OVERDUE);
             invoiceRepository.save(invoice);
             updatedCount++;
+            log.info("Batch updated invoice to overdue. invoiceId={}", invoice.getInvoiceId());
         }
 
+        log.info("Batch finished: overdue invoice update. targetCount={}, updatedCount={}", targetCount, updatedCount);
         return new BatchResult(targetCount, updatedCount);
     }
 }

@@ -19,6 +19,9 @@ import com.dev.k.invoice.customer.dto.CustomerResponse;
 import com.dev.k.invoice.customer.dto.CustomerUpdateRequest;
 import com.dev.k.invoice.customer.service.CustomerService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
@@ -31,7 +34,11 @@ public class CustomerController {
 
     @PostMapping
     public ApiResponse<CustomerResponse> create(@Valid @RequestBody CustomerCreateRequest request) {
-        return ApiResponse.success(customerService.create(request));
+    	log.info("API start: create customer. customerCode={}", request.getCustomerCode());
+    	CustomerResponse response = customerService.create(request);
+    	log.info("API success: create customer. customerId={}", response.getCustomerId());
+    	
+    	return ApiResponse.success(response);
     }
 
     @PutMapping("/{customerId}")
@@ -39,16 +46,28 @@ public class CustomerController {
             @PathVariable UUID customerId,
             @Valid @RequestBody CustomerUpdateRequest request
     ) {
-        return ApiResponse.success(customerService.update(customerId, request));
+    	log.info("API start: update customer. customerId={}", customerId);
+        CustomerResponse response = customerService.update(customerId, request);
+        log.info("API success: update customer. customerId={}", response.getCustomerId());
+        
+        return ApiResponse.success(response);
     }
 
     @GetMapping("/{customerId}")
     public ApiResponse<CustomerResponse> findById(@PathVariable UUID customerId) {
-        return ApiResponse.success(customerService.findById(customerId));
+    	log.info("API start: find customer by id. customerId={}", customerId);
+        CustomerResponse response = customerService.findById(customerId);
+        log.info("API success: find customer by id. customerId={}", response.getCustomerId());
+        
+        return ApiResponse.success(response);
     }
 
     @GetMapping
     public ApiResponse<List<CustomerResponse>> findAll() {
-        return ApiResponse.success(customerService.findAll());
+    	log.info("API start: find all customers.");
+        List<CustomerResponse> response = customerService.findAll();
+        log.info("API success: find all customers. count={}", response.size());
+        
+        return ApiResponse.success(response);
     }
 }

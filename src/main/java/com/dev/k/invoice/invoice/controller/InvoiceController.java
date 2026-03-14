@@ -22,6 +22,9 @@ import com.dev.k.invoice.invoice.dto.InvoiceUpdateRequest;
 import com.dev.k.invoice.invoice.service.InvoiceQueryService;
 import com.dev.k.invoice.invoice.service.InvoiceService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/invoices")
 public class InvoiceController {
@@ -39,24 +42,50 @@ public class InvoiceController {
 
     @PostMapping
     public ApiResponse<InvoiceResponse> create(@Valid @RequestBody InvoiceCreateRequest request) {
-        return ApiResponse.success(invoiceService.create(request));
+        log.info("API start: create invoice. invoiceNo={}, customerId={}", request.getInvoiceNo(), request.getCustomerId());
+
+        InvoiceResponse response = invoiceService.create(request);
+
+        log.info("API success: create invoice. invoiceId={}, invoiceNo={}", response.getInvoiceId(), response.getInvoiceNo());
+        return ApiResponse.success(response);
     }
 
     @PutMapping("/{invoiceId}")
     public ApiResponse<InvoiceResponse> update(
             @PathVariable UUID invoiceId,
-            @RequestBody InvoiceUpdateRequest request
+            @Valid @RequestBody InvoiceUpdateRequest request
     ) {
-        return ApiResponse.success(invoiceService.update(invoiceId, request));
+        log.info("API start: update invoice. invoiceId={}", invoiceId);
+
+        InvoiceResponse response = invoiceService.update(invoiceId, request);
+
+        log.info("API success: update invoice. invoiceId={}", response.getInvoiceId());
+        return ApiResponse.success(response);
     }
 
     @GetMapping("/{invoiceId}")
     public ApiResponse<InvoiceResponse> findById(@PathVariable UUID invoiceId) {
-        return ApiResponse.success(invoiceService.findById(invoiceId));
+        log.info("API start: find invoice by id. invoiceId={}", invoiceId);
+
+        InvoiceResponse response = invoiceService.findById(invoiceId);
+
+        log.info("API success: find invoice by id. invoiceId={}, status={}", response.getInvoiceId(), response.getStatus());
+        return ApiResponse.success(response);
     }
 
     @PostMapping("/search")
     public ApiResponse<List<InvoiceSummaryResponse>> search(@RequestBody InvoiceSearchRequest request) {
-        return ApiResponse.success(invoiceQueryService.search(request));
+        log.info(
+                "API start: search invoices. customerId={}, status={}, dueDateFrom={}, dueDateTo={}",
+                request.getCustomerId(),
+                request.getStatus(),
+                request.getDueDateFrom(),
+                request.getDueDateTo()
+        );
+
+        List<InvoiceSummaryResponse> response = invoiceQueryService.search(request);
+
+        log.info("API success: search invoices. count={}", response.size());
+        return ApiResponse.success(response);
     }
 }

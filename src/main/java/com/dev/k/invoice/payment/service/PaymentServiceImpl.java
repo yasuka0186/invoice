@@ -17,6 +17,9 @@ import com.dev.k.invoice.payment.dto.PaymentResponse;
 import com.dev.k.invoice.payment.entity.InvoicePayment;
 import com.dev.k.invoice.payment.repository.InvoicePaymentRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional
 public class PaymentServiceImpl implements PaymentService {
@@ -37,14 +40,35 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentResponse create(PaymentCreateRequest request) {
+        log.info("Service start: create payment. invoiceId={}, paidAmount={}", request.getInvoiceId(), request.getPaidAmount());
 
         Invoice invoice = invoiceRepository.findById(request.getInvoiceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found."));
+                .orElseThrow(() -> {
+                    log.warn("Resource not found: invoice. invoiceId={}", request.getInvoiceId());
+                    return new ResourceNotFoundException("Invoice not found.");
+                });
 
         Integer currentTotal = paymentRepository.sumPaidAmountByInvoiceId(invoice.getInvoiceId());
         int newTotal = currentTotal + request.getPaidAmount();
 
+        log.info(
+                "Payment amount check. invoiceId={}, invoiceAmount={}, currentTotal={}, requestAmount={}, newTotal={}",
+                invoice.getInvoiceId(),
+                invoice.getAmount(),
+                currentTotal,
+                request.getPaidAmount(),
+                newTotal
+        );
+
         if (newTotal > invoice.getAmount()) {
+            log.warn(
+                    "Over payment detected. invoiceId={}, invoiceAmount={}, currentTotal={}, requestAmount={}, newTotal={}",
+                    invoice.getInvoiceId(),
+                    invoice.getAmount(),
+                    currentTotal,
+                    request.getPaidAmount(),
+                    newTotal
+            );
             throw new BusinessException(ErrorCode.OVER_PAYMENT, "Payment exceeds invoice amount.");
         }
 
@@ -59,25 +83,37 @@ public class PaymentServiceImpl implements PaymentService {
         InvoicePayment savedPayment = paymentRepository.save(payment);
 
         if (newTotal == invoice.getAmount()) {
+            log.info("Invoice fully paid. invoiceId={}", invoice.getInvoiceId());
             invoiceStatusUpdateService.markAsPaid(invoice.getInvoiceId());
         }
 
+        log.info("Service success: create payment. paymentId={}, invoiceId={}", savedPayment.getPaymentId(), savedPayment.getInvoiceId());
         return toResponse(savedPayment);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<PaymentResponse> findByInvoiceId(UUID invoiceId) {
-        return paymentRepository.findByInvoiceIdOrderByPaidAtAsc(invoiceId)
+        log.info("Service start: find payments by invoiceId. invoiceId={}", invoiceId);
+
+        List<PaymentResponse> response = paymentRepository.findByInvoiceIdOrderByPaidAtAsc(invoiceId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
+
+        log.info("Service success: find payments by invoiceId. invoiceId={}, count={}", invoiceId, response.size());
+        return response;
     }
 
     @Override
     @Transactional(readOnly = true)
     public int calculateTotalPaidAmount(UUID invoiceId) {
-        return paymentRepository.sumPaidAmountByInvoiceId(invoiceId);
+        log.info("Service start: calculate total paid amount. invoiceId={}", invoiceId);
+
+        int totalPaidAmount = paymentRepository.sumPaidAmountByInvoiceId(invoiceId);
+
+        log.info("Service success: calculate total paid amount. invoiceId={}, totalPaidAmount={}", invoiceId, totalPaidAmount);
+        return totalPaidAmount;
     }
 
     private PaymentResponse toResponse(InvoicePayment payment) {

@@ -15,6 +15,9 @@ import com.dev.k.invoice.customer.dto.CustomerUpdateRequest;
 import com.dev.k.invoice.customer.entity.Customer;
 import com.dev.k.invoice.customer.repository.CustomerRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional
 public class CustomerServiceImpl implements CustomerService {
@@ -27,7 +30,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponse create(CustomerCreateRequest request) {
+        log.info("Service start: create customer. customerCode={}", request.getCustomerCode());
+
         if (customerRepository.existsByCustomerCode(request.getCustomerCode())) {
+            log.warn("Validation error: customer code already exists. customerCode={}", request.getCustomerCode());
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Customer code already exists.");
         }
 
@@ -39,13 +45,20 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setIsActive(true);
 
         Customer savedCustomer = customerRepository.save(customer);
+
+        log.info("Service success: create customer. customerId={}", savedCustomer.getCustomerId());
         return toResponse(savedCustomer);
     }
 
     @Override
     public CustomerResponse update(UUID customerId, CustomerUpdateRequest request) {
+        log.info("Service start: update customer. customerId={}", customerId);
+
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found."));
+                .orElseThrow(() -> {
+                    log.warn("Resource not found: customer. customerId={}", customerId);
+                    return new ResourceNotFoundException("Customer not found.");
+                });
 
         customer.setName(request.getName());
         customer.setEmail(request.getEmail());
@@ -55,24 +68,38 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         Customer updatedCustomer = customerRepository.save(customer);
+
+        log.info("Service success: update customer. customerId={}", updatedCustomer.getCustomerId());
         return toResponse(updatedCustomer);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CustomerResponse findById(UUID customerId) {
+        log.info("Service start: find customer by id. customerId={}", customerId);
+
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found."));
+                .orElseThrow(() -> {
+                    log.warn("Resource not found: customer. customerId={}", customerId);
+                    return new ResourceNotFoundException("Customer not found.");
+                });
+
+        log.info("Service success: find customer by id. customerId={}", customer.getCustomerId());
         return toResponse(customer);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CustomerResponse> findAll() {
-        return customerRepository.findAll()
+        log.info("Service start: find all customers.");
+
+        List<CustomerResponse> response = customerRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
+
+        log.info("Service success: find all customers. count={}", response.size());
+        return response;
     }
 
     private CustomerResponse toResponse(Customer customer) {
@@ -84,4 +111,5 @@ public class CustomerServiceImpl implements CustomerService {
         response.setIsActive(customer.getIsActive());
         return response;
     }
+
 }

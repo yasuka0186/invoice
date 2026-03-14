@@ -11,6 +11,9 @@ import com.dev.k.invoice.invoice.entity.Invoice;
 import com.dev.k.invoice.invoice.repository.InvoiceRepository;
 import com.dev.k.invoice.payment.repository.InvoicePaymentRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class InvoiceQueryServiceImpl implements InvoiceQueryService {
@@ -28,7 +31,15 @@ public class InvoiceQueryServiceImpl implements InvoiceQueryService {
 
     @Override
     public List<InvoiceSummaryResponse> search(InvoiceSearchRequest request) {
-        return invoiceRepository.findAll()
+        log.info(
+                "Service start: search invoices. customerId={}, status={}, dueDateFrom={}, dueDateTo={}",
+                request.getCustomerId(),
+                request.getStatus(),
+                request.getDueDateFrom(),
+                request.getDueDateTo()
+        );
+
+        List<InvoiceSummaryResponse> response = invoiceRepository.findAll()
                 .stream()
                 .filter(invoice -> request.getCustomerId() == null
                         || invoice.getCustomerId().equals(request.getCustomerId()))
@@ -40,6 +51,9 @@ public class InvoiceQueryServiceImpl implements InvoiceQueryService {
                         || !invoice.getDueDate().isAfter(request.getDueDateTo()))
                 .map(this::toSummaryResponse)
                 .toList();
+
+        log.info("Service success: search invoices. count={}", response.size());
+        return response;
     }
 
     private InvoiceSummaryResponse toSummaryResponse(Invoice invoice) {

@@ -17,6 +17,9 @@ import com.dev.k.invoice.payment.dto.PaymentCreateRequest;
 import com.dev.k.invoice.payment.dto.PaymentResponse;
 import com.dev.k.invoice.payment.service.PaymentService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -29,11 +32,21 @@ public class PaymentController {
 
     @PostMapping
     public ApiResponse<PaymentResponse> create(@Valid @RequestBody PaymentCreateRequest request) {
-        return ApiResponse.success(paymentService.create(request));
+        log.info("API start: create payment. invoiceId={}, paidAmount={}", request.getInvoiceId(), request.getPaidAmount());
+
+        PaymentResponse response = paymentService.create(request);
+
+        log.info("API success: create payment. paymentId={}, invoiceId={}", response.getPaymentId(), response.getInvoiceId());
+        return ApiResponse.success(response);
     }
 
     @GetMapping("/invoice/{invoiceId}")
     public ApiResponse<List<PaymentResponse>> findByInvoiceId(@PathVariable UUID invoiceId) {
-        return ApiResponse.success(paymentService.findByInvoiceId(invoiceId));
+        log.info("API start: find payments by invoiceId. invoiceId={}", invoiceId);
+
+        List<PaymentResponse> response = paymentService.findByInvoiceId(invoiceId);
+
+        log.info("API success: find payments by invoiceId. invoiceId={}, count={}", invoiceId, response.size());
+        return ApiResponse.success(response);
     }
 }
