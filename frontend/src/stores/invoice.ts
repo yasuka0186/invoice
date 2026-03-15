@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { fetchInvoiceById, fetchInvoices } from '@/api/invoiceApi'
-import type { Invoice, InvoiceSearchParams } from '@/types/invoice'
+import { createInvoice, fetchInvoiceById, fetchInvoices } from '@/api/invoiceApi'
+import type { CreateInvoiceRequest, Invoice, InvoiceSearchParams } from '@/types/invoice'
 
 /**
  * 請求情報を管理する Pinia Store
@@ -73,6 +73,27 @@ export const useInvoiceStore = defineStore('invoice', {
       } catch (error) {
         console.error('請求詳細取得失敗:', error)
         this.errorMessage = '請求詳細の取得に失敗しました。'
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * 新しい請求を登録する
+     * - 登録成功時は登録結果を返す
+     * - 登録失敗時は errorMessage を設定して例外を再送出する
+     */
+    async registerInvoice(request: CreateInvoiceRequest): Promise<Invoice> {
+      this.isLoading = true
+      this.errorMessage = null
+
+      try {
+        const createdInvoice = await createInvoice(request)
+        return createdInvoice
+      } catch (error) {
+        console.error('請求登録失敗:', error)
+        this.errorMessage = '請求登録に失敗しました。入力内容を確認してください。'
+        throw error
       } finally {
         this.isLoading = false
       }
