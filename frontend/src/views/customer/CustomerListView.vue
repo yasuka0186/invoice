@@ -12,6 +12,27 @@
 </template>
 
 <script setup lang="ts">
-// 顧客一覧画面
-// 今回は空画面のみ作成し、後続で顧客一覧テーブルを追加する
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useCustomerStore } from '@/stores/customer'
+
+/**
+ * 顧客Storeを取得
+ */
+const customerStore = useCustomerStore()
+
+/**
+ * store の state をリアクティブ参照として取り出す
+ */
+const { customers, isLoading, errorMessage } = storeToRefs(customerStore)
+
+/**
+ * 画面表示時に顧客一覧を取得する
+ */
+onMounted(async () => {
+  await customerStore.loadCustomers()
+  console.log('customers:', customers.value)
+  console.log('isLoading:', isLoading.value)
+  console.log('errorMessage:', errorMessage.value)
+})
 </script>

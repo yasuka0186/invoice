@@ -12,6 +12,19 @@
 </template>
 
 <script setup lang="ts">
-// 請求一覧画面
-// 今回は空画面のみ作成し、後続で検索フォームやテーブルを追加する
+import { onMounted } from 'vue'
+import { fetchInvoices } from '@/api/invoiceApi'
+
+/**
+ * 画面表示時に請求一覧取得APIを呼び出して
+ * コンソールに結果を出力する動作確認用コード
+ */
+onMounted(async () => {
+  try {
+    const invoices = await fetchInvoices()
+    console.log('請求一覧取得結果:', invoices)
+  } catch (error) {
+    console.error('請求一覧取得失敗:', error)
+  }
+})
 </script>
