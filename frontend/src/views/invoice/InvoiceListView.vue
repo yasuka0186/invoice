@@ -8,23 +8,104 @@
     <div class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
       <p class="text-slate-600">ここに請求検索フォームと請求一覧テーブルを実装します。</p>
     </div>
+
+    <!-- エラーメッセージ表示 -->
+    <ErrorMessage :message="errorMessage" />
+
+    <!-- 検索フォーム -->
+    <InvoiceSearchForm
+      v-model="searchForm"
+      @search="handleSearch"
+      @clear="handleClear"
+      @create="goToCreate"
+    />
+
+    <!-- 一覧テーブル -->
+    <InvoiceTable :invoices="invoices" :loading="isLoading" @detail="goToDetail" />
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { fetchInvoices } from '@/api/invoiceApi'
+import { onMounted, reactive } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
+import ErrorMessage from '@/components/common/ErrorMessage.vue'
+import InvoiceSearchForm from '@/components/invoice/InvoiceSearchForm.vue'
+import InvoiceTable from '@/components/invoice/invoiceTable.vue'
+import { useInvoiceStore } from '@/stores/invoice'
+import type { InvoiceSearchParams } from '@/types/invoice'
 
 /**
- * 画面表示時に請求一覧取得APIを呼び出して
- * コンソールに結果を出力する動作確認用コード
+ * ルーターを取得
+ * - 新規登録画面、詳細画面への遷移に使用する
+ */
+const router = useRouter()
+
+/**
+ * 請求Storeを取得
+ */
+const invoiceStore = useInvoiceStore()
+
+/**
+ * Storeのstateをリアクティブ参照として取得
+ */
+const { invoices, isLoading, errorMessage } = storeToRefs(invoiceStore)
+
+/**
+ * 検索フォームのローカル状態
+ * フォーム入力は local state とする設計方針
+ */
+const searchForm = reactive<InvoiceSearchParams>({
+  customerId: '',
+  status: '',
+  dueDateFrom: '',
+  dueDateTo: '',
+})
+
+/**
+ * 画面初期表示時に請求一覧を取得する
  */
 onMounted(async () => {
-  try {
-    const invoices = await fetchInvoices()
-    console.log('請求一覧取得結果:', invoices)
-  } catch (error) {
-    console.error('請求一覧取得失敗:', error)
-  }
+  await invoiceStore.loadInvoices({})
 })
+
+/**
+ * 検索ボタン押下時の処理
+ * 現在のフォーム入力値で請求一覧を再取得する
+ */
+const handleSearch = async () => {
+  await invoiceStore.loadInvoices({
+    customerId: searchForm.customerId || '',
+    status: searchForm.status || '',
+    dueDateFrom: searchForm.dueDateFrom || '',
+    dueDateTo: searchForm.dueDateTo || '',
+  })
+}
+
+/**
+ * クリアボタン押下時の処理
+ * フォームを初期化し、全件検索を再実行する
+ */
+const handleClear = async () => {
+  searchForm.customerId = ''
+  searchForm.status = ''
+  searchForm.dueDateFrom = ''
+  searchForm.dueDateTo = ''
+
+  await invoiceStore.loadInvoices({})
+}
+
+/**
+ * 新規請求登録画面へ遷移する
+ */
+const goToCreate = () => {
+  router.push('/invoices/new')
+}
+
+/**
+ * 請求詳細画面へ遷移する
+ */
+const goToDetail = (invoiceId: string) => {
+  router.push(`/invoices/${invoiceId}`)
+}
 </script>
