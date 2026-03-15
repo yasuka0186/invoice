@@ -35,7 +35,8 @@
 import { computed } from 'vue'
 
 interface Props {
-  modelValue: string | number
+  // undefinedの追加は一時的な処置
+  modelValue: string | number | undefined
   id?: string
   label?: string
   type?: string

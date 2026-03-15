@@ -47,7 +47,8 @@ export interface SelectOption {
 }
 
 interface Props {
-  modelValue: string
+  // undefinedは一時的な処置
+  modelValue: string | undefined
   id?: string
   label?: string
   options: SelectOption[]
