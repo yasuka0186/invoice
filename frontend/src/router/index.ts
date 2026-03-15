@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CustomerListView from '@/views/customer/CustomerListView.vue'
-import InvoiceListView from '@/views/invoice/Invoice/InvoiceListView.vue'
+import InvoiceListView from '@/views/invoice/InvoiceListView.vue'
 import InvoiceCreateView from '@/views/invoice/InvoiceDetailView.vue'
-import InvoiceDetailView from '@/views/invoice/PaymentCreateView.vue'
+import InvoiceDetailView from '@/views/invoice/InvoiceDetailView.vue'
 import PaymentCreateView from '@/views/payment/PaymentCreateView.vue'
 
 /**
