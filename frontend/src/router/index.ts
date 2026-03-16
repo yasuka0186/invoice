@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import CustomerListView from '@/views/customer/CustomerListView.vue'
 import InvoiceListView from '@/views/invoice/InvoiceListView.vue'
-import InvoiceCreateView from '@/views/invoice/InvoiceDetailView.vue'
+import InvoiceCreateView from '@/views/invoice/InvoiceCreateView.vue'
 import InvoiceDetailView from '@/views/invoice/InvoiceDetailView.vue'
 import PaymentCreateView from '@/views/payment/PaymentCreateView.vue'
 
@@ -49,7 +49,7 @@ const routes = [
  */
 export const router = createRouter({
   history: createWebHistory(),
-  routes: [],
+  routes,
 })
 
 export default router
