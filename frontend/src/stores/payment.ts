@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { fetchPaymentsByInvoiceId } from '@/api/paymentApi'
-import type { Payment } from '@/types/payment'
+import { createPayment, fetchPaymentsByInvoiceId } from '@/api/paymentApi'
+import type { CreatePaymentRequest, Payment } from '@/types/payment'
 
 /**
  * 支払履歴を管理する Pinia Store
@@ -48,6 +48,27 @@ export const usePaymentStore = defineStore('payment', {
       } catch (error) {
         console.error('支払履歴取得失敗:', error)
         this.errorMessage = '支払履歴の取得に失敗しました。'
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    /**
+     * 新しい支払を登録する
+     * - 登録成功時は登録結果を返す
+     * - 失敗時は errorMessage を設定して例外を再送出する
+     */
+    async registerPayment(request: CreatePaymentRequest): Promise<Payment> {
+      this.isLoading = true
+      this.errorMessage = null
+
+      try {
+        const createdPayment = await createPayment(request)
+        return createdPayment
+      } catch (error) {
+        console.error('支払登録失敗:', error)
+        this.errorMessage = '支払登録に失敗しました。入力内容を確認してください。'
+        throw error
       } finally {
         this.isLoading = false
       }
