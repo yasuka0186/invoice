@@ -29,13 +29,12 @@ axiosInstance.interceptors.request.use(
 
 /**
  * レスポンス受信後の共通処理
- * 今後、共通エラーハンドリングを追加しやすいように interceptor を定義
+ * - 正常時はそのまま返す
+ * - エラー時は reject して store 側で共通整形する
  */
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    return Promise.reject(error)
-  },
+  (error) => Promise.reject(error),
 )
 
 export default axiosInstance

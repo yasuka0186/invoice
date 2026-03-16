@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { createInvoice, fetchInvoiceById, fetchInvoices } from '@/api/invoiceApi'
+import { toAppError } from '@/utils/error'
 import type { CreateInvoiceRequest, Invoice, InvoiceSearchParams } from '@/types/invoice'
 
 /**
@@ -30,7 +31,6 @@ export const useInvoiceStore = defineStore('invoice', {
 
     /**
      * 未完済の請求のみ返す
-     * 一覧画面での絞り込みや件数表示に転用しやすい
      */
     unpaidInvoices: (state): Invoice[] => {
       return state.invoices.filter((invoice) => invoice.status !== 'PAID')
@@ -40,8 +40,6 @@ export const useInvoiceStore = defineStore('invoice', {
   actions: {
     /**
      * 請求一覧を検索条件付きで取得する
-     * - 検索条件を state に保持
-     * - 一覧を更新
      */
     async loadInvoices(params: InvoiceSearchParams = {}) {
       this.isLoading = true
@@ -52,8 +50,9 @@ export const useInvoiceStore = defineStore('invoice', {
         const invoices = await fetchInvoices(params)
         this.invoices = invoices
       } catch (error) {
+        const appError = toAppError(error)
         console.error('請求一覧取得失敗:', error)
-        this.errorMessage = '請求一覧の取得に失敗しました。'
+        this.errorMessage = appError.message
       } finally {
         this.isLoading = false
       }
@@ -61,7 +60,6 @@ export const useInvoiceStore = defineStore('invoice', {
 
     /**
      * 請求IDを指定して請求詳細を取得する
-     * - 請求詳細画面で使用する
      */
     async loadInvoiceById(invoiceId: string) {
       this.isLoading = true
@@ -71,8 +69,9 @@ export const useInvoiceStore = defineStore('invoice', {
         const invoice = await fetchInvoiceById(invoiceId)
         this.selectedInvoice = invoice
       } catch (error) {
+        const appError = toAppError(error)
         console.error('請求詳細取得失敗:', error)
-        this.errorMessage = '請求詳細の取得に失敗しました。'
+        this.errorMessage = appError.message
       } finally {
         this.isLoading = false
       }
@@ -80,8 +79,6 @@ export const useInvoiceStore = defineStore('invoice', {
 
     /**
      * 新しい請求を登録する
-     * - 登録成功時は登録結果を返す
-     * - 登録失敗時は errorMessage を設定して例外を再送出する
      */
     async registerInvoice(request: CreateInvoiceRequest): Promise<Invoice> {
       this.isLoading = true
@@ -91,8 +88,9 @@ export const useInvoiceStore = defineStore('invoice', {
         const createdInvoice = await createInvoice(request)
         return createdInvoice
       } catch (error) {
+        const appError = toAppError(error)
         console.error('請求登録失敗:', error)
-        this.errorMessage = '請求登録に失敗しました。入力内容を確認してください。'
+        this.errorMessage = appError.message
         throw error
       } finally {
         this.isLoading = false
@@ -101,7 +99,6 @@ export const useInvoiceStore = defineStore('invoice', {
 
     /**
      * 現在の検索条件で請求一覧を再取得する
-     * - 再検索や登録後の再読込で使いやすい補助メソッド
      */
     async reloadInvoices() {
       await this.loadInvoices(this.searchParams)

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { createPayment, fetchPaymentsByInvoiceId } from '@/api/paymentApi'
+import { toAppError } from '@/utils/error'
 import type { CreatePaymentRequest, Payment } from '@/types/payment'
 
 /**
@@ -26,7 +27,6 @@ export const usePaymentStore = defineStore('payment', {
 
     /**
      * 支払金額合計を返す
-     * 請求詳細画面の補足情報などに使いやすい
      */
     totalPaymentAmount: (state): number => {
       return state.payments.reduce((sum, payment) => sum + payment.paymentAmount, 0)
@@ -36,7 +36,6 @@ export const usePaymentStore = defineStore('payment', {
   actions: {
     /**
      * 指定請求IDに紐づく支払履歴を取得する
-     * - 請求詳細画面で使用する
      */
     async loadPaymentsByInvoiceId(invoiceId: string) {
       this.isLoading = true
@@ -46,8 +45,9 @@ export const usePaymentStore = defineStore('payment', {
         const payments = await fetchPaymentsByInvoiceId(invoiceId)
         this.payments = payments
       } catch (error) {
+        const appError = toAppError(error)
         console.error('支払履歴取得失敗:', error)
-        this.errorMessage = '支払履歴の取得に失敗しました。'
+        this.errorMessage = appError.message
       } finally {
         this.isLoading = false
       }
@@ -55,8 +55,6 @@ export const usePaymentStore = defineStore('payment', {
 
     /**
      * 新しい支払を登録する
-     * - 登録成功時は登録結果を返す
-     * - 失敗時は errorMessage を設定して例外を再送出する
      */
     async registerPayment(request: CreatePaymentRequest): Promise<Payment> {
       this.isLoading = true
@@ -66,8 +64,9 @@ export const usePaymentStore = defineStore('payment', {
         const createdPayment = await createPayment(request)
         return createdPayment
       } catch (error) {
+        const appError = toAppError(error)
         console.error('支払登録失敗:', error)
-        this.errorMessage = '支払登録に失敗しました。入力内容を確認してください。'
+        this.errorMessage = appError.message
         throw error
       } finally {
         this.isLoading = false

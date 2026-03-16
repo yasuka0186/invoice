@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { fetchCustomers } from '@/api/customerApi'
+import { toAppError } from '@/utils/error'
 import type { Customer } from '@/types/customer'
 
 /**
@@ -19,7 +20,6 @@ export const useCustomerStore = defineStore('customer', {
   getters: {
     /**
      * 有効な顧客のみを返す
-     * 今後、請求登録時の顧客選択などで使いやすいように用意
      */
     activeCustomers: (state): Customer[] => {
       return state.customers.filter((customer) => customer.active)
@@ -36,9 +36,6 @@ export const useCustomerStore = defineStore('customer', {
   actions: {
     /**
      * 顧客一覧を取得する
-     * - 取得前にローディング開始
-     * - 成功時に一覧を保存
-     * - 失敗時にエラーメッセージを保存
      */
     async loadCustomers() {
       this.isLoading = true
@@ -48,8 +45,9 @@ export const useCustomerStore = defineStore('customer', {
         const customers = await fetchCustomers()
         this.customers = customers
       } catch (error) {
+        const appError = toAppError(error)
         console.error('顧客一覧取得失敗:', error)
-        this.errorMessage = '顧客一覧の取得に失敗しました。'
+        this.errorMessage = appError.message
       } finally {
         this.isLoading = false
       }
@@ -57,7 +55,6 @@ export const useCustomerStore = defineStore('customer', {
 
     /**
      * 顧客一覧をクリアする
-     * - 画面離脱時や再初期化時に利用可能
      */
     clearCustomers() {
       this.customers = []
