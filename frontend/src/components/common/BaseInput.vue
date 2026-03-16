@@ -9,7 +9,7 @@
     <!-- 共通入力欄 -->
     <input
       :id="id"
-      :model-value="modelValue"
+      :value="modelValue"
       :type="type"
       :placeholder="placeholder"
       :disabled="disabled"

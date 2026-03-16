@@ -14,7 +14,8 @@
 
     <!-- 検索フォーム -->
     <InvoiceSearchForm
-      v-model="searchForm"
+      :model-value="searchForm"
+      @update:model-value="handleSearchFormUpdate"
       @search="handleSearch"
       @clear="handleClear"
       @create="goToCreate"
@@ -61,6 +62,16 @@ const searchForm = reactive<InvoiceSearchParams>({
   dueDateFrom: '',
   dueDateTo: '',
 })
+
+/**
+ * 子コンポーネントから受け取った検索条件で親の状態を更新する
+ */
+const handleSearchFormUpdate = (value: InvoiceSearchParams) => {
+  searchForm.customerId = value.customerId ?? ''
+  searchForm.status = value.status ?? ''
+  searchForm.dueDateFrom = value.dueDateFrom ?? ''
+  searchForm.dueDateTo = value.dueDateTo ?? ''
+}
 
 /**
  * 画面初期表示時に請求一覧を取得する
