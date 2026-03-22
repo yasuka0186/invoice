@@ -1,19 +1,21 @@
 import axiosInstance from '@/api/axios'
-import type { CreateInvoiceRequest, Invoice, InvoiceSearchParams } from '@/types/invoice'
+import type { ApiResponse } from '@/types/api'
+import type {
+  CreateInvoiceRequest,
+  Invoice,
+  InvoiceSearchParams,
+  InvoiceSummary,
+} from '@/types/invoice'
 
 /**
- * 請求一覧取得APIのレスポンス型
- * - MVPでは単純な配列レスポンスを想定
- * - Spring 側がページング形式の場合は後で PageResponse<Invoice> に変更可能
+ * 請求一覧検索APIのレスポンス型
  */
-export type GetInvoicesResponse = Invoice[]
+export type SearchInvoicesResponse = InvoiceSummary[]
 
 /**
- * 請求検索条件をクエリパラメータ形式に変換する関数
- * - 未入力値は送信しない
- * - APIに不要な空文字を渡さないための前処理
+ * 請求検索条件をリクエストボディ形式に変換する関数
  */
-const buildInvoiceSearchParams = (params: InvoiceSearchParams) => {
+const buildInvoiceSearchRequest = (params: InvoiceSearchParams) => {
   return {
     customerId: params.customerId || undefined,
     status: params.status || undefined,
@@ -24,31 +26,29 @@ const buildInvoiceSearchParams = (params: InvoiceSearchParams) => {
 
 /**
  * 請求一覧を検索・取得するAPI
- * - 顧客ID、ステータス、支払期限From/To を条件に検索可能
  */
 export const fetchInvoices = async (
   params: InvoiceSearchParams = {},
-): Promise<GetInvoicesResponse> => {
-  const response = await axiosInstance.get<GetInvoicesResponse>('/invoices', {
-    params: buildInvoiceSearchParams(params),
-  })
-  return response.data
+): Promise<SearchInvoicesResponse> => {
+  const response = await axiosInstance.post<ApiResponse<SearchInvoicesResponse>>(
+    '/invoices/search',
+    buildInvoiceSearchRequest(params),
+  )
+  return response.data.data
 }
 
 /**
- * 請求IDを指定して請求詳細を取得するAPI
- * - 請求詳細画面で使用する
+ * 請求詳細取得API
  */
 export const fetchInvoiceById = async (invoiceId: string): Promise<Invoice> => {
-  const response = await axiosInstance.get<Invoice>(`/invoices/${invoiceId}`)
-  return response.data
+  const response = await axiosInstance.get<ApiResponse<Invoice>>(`/invoices/${invoiceId}`)
+  return response.data.data
 }
 
 /**
- * 新しい請求を登録するAPI
- * - 請求登録画面で使用する
+ * 請求登録API
  */
 export const createInvoice = async (request: CreateInvoiceRequest): Promise<Invoice> => {
-  const response = await axiosInstance.post<Invoice>('/invoices', request)
-  return response.data
+  const response = await axiosInstance.post<ApiResponse<Invoice>>('/invoices', request)
+  return response.data.data
 }

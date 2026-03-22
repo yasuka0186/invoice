@@ -42,3 +42,29 @@ export interface AppError {
   status?: number
   fieldErrors?: FieldError[]
 }
+
+/**
+ * API共通レスポンス型
+ *
+ * Spring Boot 側の ApiResponse<T> に対応
+ *
+ * {
+ *   code: "SUCCESS" | "ERROR" など
+ *   message: メッセージ文字列
+ *   data: 実際のレスポンスデータ
+ * }
+ *
+ * 使用例：
+ * ApiResponse<Invoice[]>
+ * ApiResponse<InvoiceSummary[]>
+ */
+export type ApiResponse<T> = {
+  /** ステータスコード（SUCCESS / ERROR など） */
+  code: string
+
+  /** メッセージ（成功・エラー内容） */
+  message: string
+
+  /** 実データ（ジェネリクスで可変） */
+  data: T
+}

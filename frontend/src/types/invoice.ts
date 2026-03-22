@@ -21,6 +21,37 @@ export interface Invoice {
 }
 
 /**
+ * 請求一覧表示用のサマリー型
+ *
+ * バックエンドの InvoiceSummaryResponse に対応
+ * 一覧画面で使用する軽量データ
+ *
+ * ※ 詳細画面用の Invoice とは別
+ */
+export type InvoiceSummary = {
+  /** 請求ID（UUID） */
+  invoiceId: string
+
+  /** 請求番号 */
+  invoiceNo: string
+
+  /** 顧客ID（UUID） */
+  customerId: string
+
+  /** 請求タイトル */
+  title: string
+
+  /** 請求金額 */
+  amount: number
+
+  /** 支払期限（ISO文字列） */
+  dueDate: string
+
+  /** ステータス（未払い / 支払済 / 期限切れなど） */
+  status: string
+}
+
+/**
  * 請求検索条件の型定義
  */
 export interface InvoiceSearchParams {

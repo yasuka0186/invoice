@@ -85,10 +85,14 @@ const emit = defineEmits<{
 }>()
 
 /**
- * 金額を3桁カンマ付きで表示する
+ * 金額表示用フォーマット
+ * undefined や null が来ても画面が落ちないようにする
  */
-const formatMoney = (value: number): string => {
-  return value.toLocaleString('ja-JP')
+const formatMoney = (value?: number | null): string => {
+  if (value == null) {
+    return '-'
+  }
+  return value.toLocaleString()
 }
 
 /**

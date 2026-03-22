@@ -1,5 +1,6 @@
 import axiosInstance from '@/api/axios'
 import type { CreatePaymentRequest, Payment } from '@/types/payment'
+import type { ApiResponse } from '@/types/api'
 
 /**
  * 支払一覧取得APIのレスポンス型
@@ -11,11 +12,9 @@ export type GetPaymentsResponse = Payment[]
  * 請求IDを指定して支払履歴一覧を取得するAPI
  * - 請求詳細画面の支払履歴テーブルで使用する
  */
-export const fetchPaymentsByInvoiceId = async (invoiceId: string): Promise<GetPaymentsResponse> => {
-  const response = await axiosInstance.get<GetPaymentsResponse>('/payments', {
-    params: { invoiceId },
-  })
-  return response.data
+export const fetchPaymentsByInvoiceId = async (invoiceId: string): Promise<Payment[]> => {
+  const response = await axiosInstance.get<ApiResponse<Payment[]>>(`/payments/invoice/${invoiceId}`)
+  return response.data.data
 }
 
 /**
@@ -32,6 +31,6 @@ export const fetchPaymentById = async (paymentId: string): Promise<Payment> => {
  * - 支払登録画面で使用する
  */
 export const createPayment = async (request: CreatePaymentRequest): Promise<Payment> => {
-  const response = await axiosInstance.post<Payment>('/payments', request)
-  return response.data
+  const response = await axiosInstance.post<ApiResponse<Payment>>('/payments', request)
+  return response.data.data
 }
