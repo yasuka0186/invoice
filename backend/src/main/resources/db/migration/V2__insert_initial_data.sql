@@ -1,0 +1,93 @@
+INSERT INTO customers (
+    customer_id,
+    customer_code,
+    name,
+    email,
+    is_active,
+    created_at,
+    updated_at,
+    version
+)
+VALUES
+(
+    '11111111-1111-1111-1111-111111111111',
+    'C0001',
+    '株式会社A',
+    'a@example.com',
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP,
+    0
+),
+(
+    '22222222-2222-2222-2222-222222222222',
+    'C0002',
+    '株式会社B',
+    'b@example.com',
+    true,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP,
+    0
+);
+
+INSERT INTO invoices (
+    invoice_id,
+    invoice_no,
+    customer_id,
+    title,
+    amount,
+    due_date,
+    status,
+    issued_at,
+    created_at,
+    updated_at,
+    version
+)
+VALUES (
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'INV-001',
+    '11111111-1111-1111-1111-111111111111',
+    'テスト請求',
+    10000,
+    CURRENT_DATE,
+    'DRAFT',
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP,
+    0
+);
+
+INSERT INTO invoice_payments (
+    payment_id,
+    invoice_id,
+    paid_amount,
+    paid_at,
+    method,
+    note,
+    created_at,
+    updated_at,
+    version
+)
+VALUES
+(
+    'aaaaaaaa-1111-1111-1111-111111111111',
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    5000,
+    CURRENT_TIMESTAMP,
+    'BANK_TRANSFER',
+    '前払い分',
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP,
+    0
+),
+(
+    'bbbbbbbb-2222-2222-2222-222222222222',
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    5000,
+    CURRENT_TIMESTAMP,
+    'CREDIT_CARD',
+    '残額支払い',
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP,
+    0
+);
