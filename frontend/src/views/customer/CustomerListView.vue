@@ -3,7 +3,6 @@
     <!-- 画面タイトル -->
     <div>
       <h1 class="text-2xl font-bold text-slate-800">顧客一覧</h1>
-      <p class="text-sm text-slate-500">顧客情報の一覧を表示する画面です。</p>
     </div>
 
     <!-- エラーメッセージ表示 -->
