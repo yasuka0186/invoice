@@ -32,7 +32,7 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import ErrorMessage from '@/components/common/ErrorMessage.vue'
 import InvoiceSearchForm from '@/components/invoice/InvoiceSearchForm.vue'
-import InvoiceTable from '@/components/invoice/invoiceTable.vue'
+import InvoiceTable from '@/components/invoice/InvoiceTable.vue'
 import { useInvoiceStore } from '@/stores/invoice'
 import type { InvoiceSearchParams } from '@/types/invoice'
 
