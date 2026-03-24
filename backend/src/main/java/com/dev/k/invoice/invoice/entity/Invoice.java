@@ -14,36 +14,94 @@ import jakarta.persistence.Table;
 import com.dev.k.invoice.common.entity.BaseEntity;
 import com.dev.k.invoice.invoice.constant.InvoiceStatus;
 
+/**
+ * 請求エンティティ（invoicesテーブル対応）
+ *
+ * 【役割】
+ * - 請求情報をDBに永続化するためのエンティティクラス
+ * - invoicesテーブルと1対1でマッピングされる
+ *
+ * 【継承】
+ * - BaseEntity を継承し、以下を共通管理
+ *   ・createdAt（作成日時）
+ *   ・updatedAt（更新日時）
+ *   ・version（楽観ロック）
+ *
+ * 【主な項目】
+ * - invoiceId：請求ID（主キー）
+ * - invoiceNo：請求番号（ユニーク）
+ * - customerId：顧客ID（外部キー相当）
+ * - title：請求タイトル
+ * - amount：請求金額
+ * - dueDate：支払期限
+ * - status：請求ステータス
+ * - issuedAt：請求発行日時
+ * - paidAt：支払完了日時（未完済の場合はnull）
+ *
+ * 【ステータス遷移イメージ】
+ * DRAFT → ISSUED → (PAID | OVERDUE) → CANCELLED
+ *
+ * 【補足】
+ * - 外部キー制約はDB側または別途設計で管理
+ * - 業務ロジック（残額計算など）はService層で実装
+ */
 @Entity
 @Table(name = "invoices")
 public class Invoice extends BaseEntity {
 
+	/**
+     * 請求ID（主キー）
+     */
     @Id
     @Column(name = "invoice_id", nullable = false)
     private UUID invoiceId;
 
+    /**
+     * 請求番号（ユニーク制約あり）
+     */
     @Column(name = "invoice_no", nullable = false, unique = true, length = 50)
     private String invoiceNo;
 
+    /**
+     * 顧客ID（外部キー相当）
+     */
     @Column(name = "customer_id", nullable = false)
     private UUID customerId;
 
+    /**
+     * 請求タイトル
+     */
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
+    /**
+     * 請求金額
+     */
     @Column(name = "amount", nullable = false)
     private Integer amount;
 
+    /**
+     * 支払期限日
+     */
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
+    /**
+     * 請求ステータス（Enumで管理）
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private InvoiceStatus status;
 
+    /**
+     * 請求発行日時
+     */
     @Column(name = "issued_at", nullable = false)
     private OffsetDateTime issuedAt;
 
+    /**
+     * 支払完了日時（未完済の場合はnull）
+     */
     @Column(name = "paid_at")
     private OffsetDateTime paidAt;
 

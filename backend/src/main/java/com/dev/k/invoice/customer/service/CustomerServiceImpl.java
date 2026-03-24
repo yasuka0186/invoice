@@ -17,26 +17,55 @@ import com.dev.k.invoice.customer.repository.CustomerRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 顧客サービス実装クラス
+ *
+ * 【役割】
+ * - 顧客に関するビジネスロジックを実装する
+ * - Controllerからのリクエストを受け、Repositoryを通じてDB操作を行う
+ *
+ * 【例外設計】
+ * - 業務エラー：BusinessException
+ * - 未存在：ResourceNotFoundException
+ */
 @Slf4j
 @Service
 @Transactional
 public class CustomerServiceImpl implements CustomerService {
 
+	/**
+     * 顧客リポジトリ
+     * - DBアクセスを担当
+     */
     private final CustomerRepository customerRepository;
 
+    
     public CustomerServiceImpl(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
     }
 
+    /**
+     * 顧客登録処理
+     *
+     * 【処理内容】
+     * - 顧客コードの重複チェック
+     * - UUID採番
+     * - Entity生成・保存
+     *
+     * @param request 顧客作成リクエスト
+     * @return 登録された顧客情報
+     */
     @Override
     public CustomerResponse create(CustomerCreateRequest request) {
         log.info("Service start: create customer. customerCode={}", request.getCustomerCode());
 
+        // 顧客コードの重複チェック
         if (customerRepository.existsByCustomerCode(request.getCustomerCode())) {
             log.warn("Validation error: customer code already exists. customerCode={}", request.getCustomerCode());
             throw new BusinessException(ErrorCode.VALIDATION_ERROR, "Customer code already exists.");
         }
 
+        // Entity生成
         Customer customer = new Customer();
         customer.setCustomerId(UUID.randomUUID());
         customer.setCustomerCode(request.getCustomerCode());
@@ -44,22 +73,37 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setEmail(request.getEmail());
         customer.setIsActive(true);
 
+     // 保存
         Customer savedCustomer = customerRepository.save(customer);
 
         log.info("Service success: create customer. customerId={}", savedCustomer.getCustomerId());
         return toResponse(savedCustomer);
     }
 
+    /**
+     * 顧客更新処理
+     *
+     * 【処理内容】
+     * - 顧客存在チェック
+     * - 更新対象項目の反映（部分更新）
+     * - 保存
+     *
+     * @param customerId 顧客ID
+     * @param request    更新内容
+     * @return 更新後の顧客情報
+     */
     @Override
     public CustomerResponse update(UUID customerId, CustomerUpdateRequest request) {
         log.info("Service start: update customer. customerId={}", customerId);
 
+        // 存在チェック
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> {
                     log.warn("Resource not found: customer. customerId={}", customerId);
                     return new ResourceNotFoundException("Customer not found.");
                 });
 
+        // 更新（部分更新）
         customer.setName(request.getName());
         customer.setEmail(request.getEmail());
 
@@ -73,6 +117,12 @@ public class CustomerServiceImpl implements CustomerService {
         return toResponse(updatedCustomer);
     }
 
+    /**
+     * 顧客詳細取得処理
+     *
+     * @param customerId 顧客ID
+     * @return 顧客情報
+     */
     @Override
     @Transactional(readOnly = true)
     public CustomerResponse findById(UUID customerId) {
@@ -88,6 +138,11 @@ public class CustomerServiceImpl implements CustomerService {
         return toResponse(customer);
     }
 
+    /**
+     * 顧客一覧取得処理
+     *
+     * @return 顧客一覧
+     */
     @Override
     @Transactional(readOnly = true)
     public List<CustomerResponse> findAll() {
@@ -102,6 +157,12 @@ public class CustomerServiceImpl implements CustomerService {
         return response;
     }
 
+    /**
+     * Entity → Response DTO 変換処理
+     *
+     * @param customer 顧客エンティティ
+     * @return 顧客レスポンスDTO
+     */
     private CustomerResponse toResponse(Customer customer) {
         CustomerResponse response = new CustomerResponse();
         response.setCustomerId(customer.getCustomerId());
