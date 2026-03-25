@@ -11,7 +11,7 @@
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <p class="text-xs text-slate-500">請求番号</p>
-          <p class="text-sm font-medium text-slate-800">{{ invoice.invoiceNumber }}</p>
+          <p class="text-sm font-medium text-slate-800">{{ invoice.invoiceNo }}</p>
         </div>
 
         <div>
@@ -95,8 +95,9 @@ const emit = defineEmits<{
 /**
  * 金額を3桁カンマ付きで表示する
  */
-const formatMoney = (value: number): string => {
-  return value.toLocaleString('ja-JP')
+const formatMoney = (value?: number | null) => {
+  if (value == null) return '-'
+  return value.toLocaleString()
 }
 
 /**

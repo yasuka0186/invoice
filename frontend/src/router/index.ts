@@ -31,7 +31,7 @@ const routes = [
     component: InvoiceCreateView,
   },
   {
-    path: '/invoices/:invoicedId',
+    path: '/invoices/:invoiceId',
     name: 'InvoiceDetailView',
     component: InvoiceDetailView,
     props: true,
