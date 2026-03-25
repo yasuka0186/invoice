@@ -3,11 +3,11 @@
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <!-- 請求番号 -->
       <BaseInput
-        v-model="localForm.invoiceNumber"
+        v-model="localForm.invoiceNo"
         label="請求番号"
         placeholder="例: INV-202603-0001"
         :required="true"
-        :error-message="errors.invoiceNumber"
+        :error-message="errors.invoiceNo"
       />
 
       <!-- 顧客ID -->
@@ -86,7 +86,7 @@ import ErrorMessage from '@/components/common/ErrorMessage.vue'
  * - amount は入力中は文字列で保持し、送信時に number へ変換する
  */
 export interface InvoiceFormInput {
-  invoiceNumber: string
+  invoiceNo: string
   customerId: string
   title: string
   amount: string
@@ -97,7 +97,7 @@ export interface InvoiceFormInput {
  * 項目別エラーメッセージ型
  */
 interface InvoiceFormErrors {
-  invoiceNumber: string
+  invoiceNo: string
   customerId: string
   title: string
   amount: string
@@ -135,7 +135,7 @@ const emit = defineEmits<{
  * 親の modelValue を初期値として扱う
  */
 const localForm = reactive<InvoiceFormInput>({
-  invoiceNumber: props.modelValue.invoiceNumber ?? '',
+  invoiceNo: props.modelValue.invoiceNo ?? '',
   customerId: props.modelValue.customerId ?? '',
   title: props.modelValue.title ?? '',
   amount: props.modelValue.amount ?? '',
@@ -146,7 +146,7 @@ const localForm = reactive<InvoiceFormInput>({
  * 項目別バリデーションエラーを管理する
  */
 const errors = reactive<InvoiceFormErrors>({
-  invoiceNumber: '',
+  invoiceNo: '',
   customerId: '',
   title: '',
   amount: '',
@@ -159,7 +159,7 @@ const errors = reactive<InvoiceFormErrors>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localForm.invoiceNumber = newValue.invoiceNumber ?? ''
+    localForm.invoiceNo = newValue.invoiceNo ?? ''
     localForm.customerId = newValue.customerId ?? ''
     localForm.title = newValue.title ?? ''
     localForm.amount = newValue.amount ?? ''
@@ -175,7 +175,7 @@ watch(
   localForm,
   (newValue) => {
     emit('update:modelValue', {
-      invoiceNumber: newValue.invoiceNumber,
+      invoiceNo: newValue.invoiceNo,
       customerId: newValue.customerId,
       title: newValue.title,
       amount: newValue.amount,
@@ -189,7 +189,7 @@ watch(
  * 項目別エラーを初期化する
  */
 const clearErrors = () => {
-  errors.invoiceNumber = ''
+  errors.invoiceNo = ''
   errors.customerId = ''
   errors.title = ''
   errors.amount = ''
@@ -206,8 +206,8 @@ const validateForm = (): boolean => {
 
   let isValid = true
 
-  if (!localForm.invoiceNumber.trim()) {
-    errors.invoiceNumber = '請求番号は必須です。'
+  if (!localForm.invoiceNo.trim()) {
+    errors.invoiceNo = '請求番号は必須です。'
     isValid = false
   }
 

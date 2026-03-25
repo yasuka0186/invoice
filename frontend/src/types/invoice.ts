@@ -8,7 +8,7 @@ export type InvoiceStatus = 'ISSUED' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE'
  */
 export interface Invoice {
   invoiceId: string
-  invoiceNumber: string
+  invoiceNo: string
   customerId: string
   title: string
   amount: number
@@ -65,7 +65,7 @@ export interface InvoiceSearchParams {
  * 請求登録リクエストの型定義
  */
 export interface CreateInvoiceRequest {
-  invoiceNumber: string
+  invoiceNo: string
   customerId: string
   title: string
   amount: number

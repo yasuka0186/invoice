@@ -3,7 +3,6 @@
     <!-- 画面タイトル -->
     <div>
       <h1 class="text-2xl font-bold text-slate-800">請求登録</h1>
-      <p class="text-sm text-slate-500">新しい請求を登録する画面です。</p>
     </div>
 
     <!-- 戻るリンク -->
@@ -57,7 +56,7 @@ const { isLoading, errorMessage } = storeToRefs(invoiceStore)
  * 請求登録フォームのローカル状態
  */
 const form = reactive<InvoiceFormInput>({
-  invoiceNumber: '',
+  invoiceNo: '',
   customerId: '',
   title: '',
   amount: '',
@@ -79,7 +78,7 @@ const goBackToList = () => {
 const handleSubmit = async () => {
   try {
     const request: CreateInvoiceRequest = {
-      invoiceNumber: form.invoiceNumber.trim(),
+      invoiceNo: form.invoiceNo.trim(),
       customerId: form.customerId.trim(),
       title: form.title.trim(),
       amount: Number(form.amount),
