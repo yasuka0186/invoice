@@ -9,9 +9,9 @@ export type PaymentMethod = 'BANK_TRANSFER' | 'CREDIT_CARD' | 'CASH'
 export interface Payment {
   paymentId: string
   invoiceId: string
-  paymentAmount: number
-  paymentDateTime: string
-  paymentMethod: PaymentMethod
+  paidAmount: number
+  paidAt: string
+  method: PaymentMethod
   note?: string | null
 }
 
@@ -20,8 +20,8 @@ export interface Payment {
  */
 export interface CreatePaymentRequest {
   invoiceId: string
-  paymentAmount: number
-  paymentDateTime: string
-  paymentMethod: PaymentMethod
+  paidAmount: number
+  paidAt: string
+  method: PaymentMethod
   note?: string
 }

@@ -3,7 +3,6 @@
     <!-- 画面タイトル -->
     <div>
       <h1 class="text-2xl font-bold text-slate-800">支払登録</h1>
-      <p class="text-sm text-slate-500">請求に対する支払を登録する画面です。</p>
     </div>
 
     <!-- 戻るリンク -->
@@ -67,9 +66,9 @@ const getInvoiceIdFromQuery = (): string => {
  */
 const form = reactive<PaymentFormInput>({
   invoiceId: getInvoiceIdFromQuery(),
-  paymentAmount: '',
-  paymentDateTime: '',
-  paymentMethod: '',
+  paidAmount: '',
+  paidAt: '',
+  method: '',
   note: '',
 })
 
@@ -88,9 +87,9 @@ watch(
  */
 const handleFormUpdate = (value: PaymentFormInput) => {
   form.invoiceId = value.invoiceId
-  form.paymentAmount = value.paymentAmount
-  form.paymentDateTime = value.paymentDateTime
-  form.paymentMethod = value.paymentMethod
+  form.paidAmount = value.paidAmount
+  form.paidAt = value.paidAt
+  form.method = value.method
   form.note = value.note
 }
 
@@ -125,11 +124,17 @@ const normalizePaymentDateTime = (value: string): string => {
  */
 const handleSubmit = async () => {
   try {
+
+    if (!form.method) {
+      console.error('支払方法が未選択です')
+      return
+    }
+
     const request: CreatePaymentRequest = {
       invoiceId: form.invoiceId,
-      paymentAmount: Number(form.paymentAmount),
-      paymentDateTime: normalizePaymentDateTime(form.paymentDateTime),
-      paymentMethod: form.paymentMethod,
+      paidAmount: Number(form.paidAmount),
+      paidAt: `${form.paidAt}:00+09:00`,
+      method: form.method,
       note: form.note.trim(),
     }
 

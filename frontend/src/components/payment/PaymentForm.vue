@@ -6,31 +6,31 @@
 
       <!-- 支払金額 -->
       <BaseInput
-        v-model="localForm.paymentAmount"
+        v-model="localForm.paidAmount"
         label="支払金額"
         type="number"
         placeholder="例: 3000"
         :required="true"
-        :error-message="errors.paymentAmount"
+        :error-message="errors.paidAmount"
       />
 
       <!-- 支払日時 -->
       <BaseInput
-        v-model="localForm.paymentDateTime"
+        v-model="localForm.paidAt"
         label="支払日時"
         type="datetime-local"
         :required="true"
-        :error-message="errors.paymentDateTime"
+        :error-message="errors.paidAt"
       />
 
       <!-- 支払方法 -->
       <BaseSelect
-        v-model="localForm.paymentMethod"
+        v-model="localForm.method"
         label="支払方法"
         placeholder="選択してください"
         :required="true"
         :options="paymentMethodOptions"
-        :error-message="errors.paymentMethod"
+        :error-message="errors.method"
       />
 
       <!-- 備考 -->
@@ -83,9 +83,9 @@ import type { PaymentMethod } from '@/types/payment'
  */
 export interface PaymentFormInput {
   invoiceId: string
-  paymentAmount: string
-  paymentDateTime: string
-  paymentMethod: PaymentMethod | ''
+  paidAmount: string
+  paidAt: string
+  method: PaymentMethod | ''
   note: string
 }
 
@@ -93,9 +93,9 @@ export interface PaymentFormInput {
  * 項目別エラーメッセージ型
  */
 interface PaymentFormErrors {
-  paymentAmount: string
-  paymentDateTime: string
-  paymentMethod: string
+  paidAmount: string
+  paidAt: string
+  method: string
   note: string
 }
 
@@ -139,9 +139,9 @@ const paymentMethodOptions: Array<{ label: string; value: PaymentMethod }> = [
  */
 const localForm = reactive<PaymentFormInput>({
   invoiceId: props.modelValue.invoiceId ?? '',
-  paymentAmount: props.modelValue.paymentAmount ?? '',
-  paymentDateTime: props.modelValue.paymentDateTime ?? '',
-  paymentMethod: props.modelValue.paymentMethod ?? '',
+  paidAmount: props.modelValue.paidAmount ?? '',
+  paidAt: props.modelValue.paidAt ?? '',
+  method: props.modelValue.method ?? '',
   note: props.modelValue.note ?? '',
 })
 
@@ -149,9 +149,9 @@ const localForm = reactive<PaymentFormInput>({
  * 項目別バリデーションエラーを管理する
  */
 const errors = reactive<PaymentFormErrors>({
-  paymentAmount: '',
-  paymentDateTime: '',
-  paymentMethod: '',
+  paidAmount: '',
+  paidAt: '',
+  method: '',
   note: '',
 })
 
@@ -162,9 +162,9 @@ watch(
   () => props.modelValue,
   (newValue) => {
     localForm.invoiceId = newValue.invoiceId ?? ''
-    localForm.paymentAmount = newValue.paymentAmount ?? ''
-    localForm.paymentDateTime = newValue.paymentDateTime ?? ''
-    localForm.paymentMethod = newValue.paymentMethod ?? ''
+    localForm.paidAmount = newValue.paidAmount ?? ''
+    localForm.paidAt = newValue.paidAt ?? ''
+    localForm.method = newValue.method ?? ''
     localForm.note = newValue.note ?? ''
   },
   { deep: true },
@@ -178,9 +178,9 @@ watch(
   (newValue) => {
     emit('update:modelValue', {
       invoiceId: newValue.invoiceId,
-      paymentAmount: newValue.paymentAmount,
-      paymentDateTime: newValue.paymentDateTime,
-      paymentMethod: newValue.paymentMethod,
+      paidAmount: newValue.paidAmount,
+      paidAt: newValue.paidAt,
+      method: newValue.method,
       note: newValue.note,
     })
   },
@@ -191,9 +191,9 @@ watch(
  * 項目別エラーを初期化する
  */
 const clearErrors = () => {
-  errors.paymentAmount = ''
-  errors.paymentDateTime = ''
-  errors.paymentMethod = ''
+  errors.paidAmount = ''
+  errors.paidAt = ''
+  errors.method = ''
   errors.note = ''
 }
 
@@ -205,24 +205,24 @@ const validateForm = (): boolean => {
 
   let isValid = true
 
-  if (!localForm.paymentAmount.trim()) {
-    errors.paymentAmount = '支払金額は必須です。'
+  if (!localForm.paidAmount.trim()) {
+    errors.paidAmount = '支払金額は必須です。'
     isValid = false
-  } else if (Number.isNaN(Number(localForm.paymentAmount))) {
-    errors.paymentAmount = '支払金額は数値で入力してください。'
+  } else if (Number.isNaN(Number(localForm.paidAmount))) {
+    errors.paidAmount = '支払金額は数値で入力してください。'
     isValid = false
-  } else if (Number(localForm.paymentAmount) <= 0) {
-    errors.paymentAmount = '支払金額は0より大きい値を入力してください。'
-    isValid = false
-  }
-
-  if (!localForm.paymentDateTime.trim()) {
-    errors.paymentDateTime = '支払日時は必須です。'
+  } else if (Number(localForm.paidAmount) <= 0) {
+    errors.paidAmount = '支払金額は0より大きい値を入力してください。'
     isValid = false
   }
 
-  if (!localForm.paymentMethod) {
-    errors.paymentMethod = '支払方法は必須です。'
+  if (!localForm.paidAt.trim()) {
+    errors.paidAt = '支払日時は必須です。'
+    isValid = false
+  }
+
+  if (!localForm.method) {
+    errors.method = '支払方法は必須です。'
     isValid = false
   }
 
