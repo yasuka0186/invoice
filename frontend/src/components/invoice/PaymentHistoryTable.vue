@@ -27,11 +27,11 @@
             class="border-b border-slate-100 hover:bg-slate-50"
           >
             <td class="px-4 py-3 text-sm text-slate-700">{{ index + 1 }}</td>
-            <td class="px-4 py-3 text-sm text-slate-700">{{ payment.paymentDateTime }}</td>
+            <td class="px-4 py-3 text-sm text-slate-700">{{ payment.paidAt }}</td>
             <td class="px-4 py-3 text-right text-sm text-slate-700">
-              {{ formatMoney(payment.paymentAmount) }}
+              {{ formatMoney(payment.paidAmount) }}
             </td>
-            <td class="px-4 py-3 text-sm text-slate-700">{{ payment.paymentMethod }}</td>
+            <td class="px-4 py-3 text-sm text-slate-700">{{ payment.method }}</td>
             <td class="px-4 py-3 text-sm text-slate-700">{{ payment.note || '-' }}</td>
           </tr>
         </tbody>
